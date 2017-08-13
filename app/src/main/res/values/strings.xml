@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">MyNotificationWear</string>
+    <string name="title_activity_second">SecondActivity</string>
+    <string name="reply_label">Respuesta Simple a enviar</string>
+    <string name="reply_label_choice">Respuesta de elección a enviar</string>
+</resources>
