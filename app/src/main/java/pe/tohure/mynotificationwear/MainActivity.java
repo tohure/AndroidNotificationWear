@@ -1,5 +1,6 @@
 package pe.tohure.mynotificationwear;
 
+import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -15,8 +16,13 @@ import android.view.View;
 public class MainActivity extends AppCompatActivity {
 
     public static final int NOTIFICATION_ID = 1;
+    public static final int NOTIFICATION_ID_SECOND = 2;
+    public static final int NOTIFICATION_ID_THIRD = 3;
+    public static final int NOTIFICATION_ID_FOURTH = 4;
+    public static final int NOTIFICATION_ID_GROUP = 777;
     public static final String EXTRA_VOICE_REPLY = "extra_voice_reply";
     public static final String EXTRA_VOICE_REPLY_CHOICE = "extra_voice_reply_choice";
+    public static final String GROUP_KEY_EMIALS = "group_key_emails";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
-    public void sendNotification(View view) {
+    public void sendNotificationOnePage(View view) {
 
         //Standar Intent
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://developer.android.com/reference/android/app/Notification.html"));
@@ -43,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
         Intent actionIntent = new Intent(this, SecondActivity.class);
         PendingIntent actionPendinIntent = PendingIntent.getActivity(this, 0, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Action action = new NotificationCompat.Action.Builder(R.drawable.ic_bike_notification, "Lanza Segunda Actividad", actionPendinIntent).build();
-
 
         //Voice Reply
         //Este titulo aparecerá antes de enviar la respuesta
@@ -76,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
         //Background sólo para el wearable, recomendable 400x400 o 600x400
         Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.lorem_cat);
 
-        //Agregando Acciones al wearable
+        //Agregando Acciones al wearable pero no al teléfono
         NotificationCompat.WearableExtender wearableExtender = new NotificationCompat.WearableExtender()
                 //Hide default Icon true/false
                 .setHintHideIcon(false)
@@ -100,13 +105,89 @@ public class MainActivity extends AppCompatActivity {
         //Action tanto para wearable y móvil (siempre que wearable no tenga predefinida una accion
         builder.addAction(R.drawable.ic_map_noti, "Ir mapa", mapPendIntent);
 
-        //Texto de tipo largo tanto para teléfono y wearable
-        NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
-        bigTextStyle.bigText("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum");
-        builder.setStyle(bigTextStyle);
-
         //Lanzamiento de Notificacion
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(getApplicationContext());
         notificationManagerCompat.notify(NOTIFICATION_ID, builder.build());
+    }
+
+    public void sendNotificationTwoPages(View view){
+
+        //Standar Intent
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://developer.android.com/reference/android/app/Notification.html"));
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
+        //Create builde for the main notification
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.ic_bike_notification)
+                .setContentTitle("Page 1")
+                .setContentText("Short Message")
+                .setContentIntent(pendingIntent);
+
+        //Texto de tipo largo tanto para teléfono y wearable
+        NotificationCompat.BigTextStyle secondPageStyle = new NotificationCompat.BigTextStyle();
+        secondPageStyle.setBigContentTitle("Page 2")
+                        .bigText("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum");
+
+        //Create second page notification
+        Notification secondPageNotification = new NotificationCompat.Builder(this)
+                .setStyle(secondPageStyle)
+                .build();
+
+        //Extend the notification builder with the second page
+        Notification notification = notificationBuilder
+                .extend(new NotificationCompat.WearableExtender()
+                    .addPage(secondPageNotification))
+                    .build();
+
+        //Lanzamiento de Notificacion
+        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
+        notificationManagerCompat.notify(NOTIFICATION_ID_SECOND, notification);
+    }
+
+    public void sendNotificationInGroup(View view){
+
+        //Issue the notification
+        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
+
+        //Make a first notification with group
+        Notification notification1 = new NotificationCompat.Builder(this)
+                .setContentTitle("New Email from Tohure")
+                .setContentText("Remember to make pull to the repo")
+                .setSmallIcon(R.drawable.ic_bike_notification)
+                .setGroup(GROUP_KEY_EMIALS)
+                //setLocal permite que la notificación sólo aparezca en el móvil, más no en el wearable
+                .setLocalOnly(true)
+                .build();
+
+        notificationManagerCompat.notify(NOTIFICATION_ID_THIRD,notification1);
+
+        //Make a first notification with group
+        Notification notification2 = new NotificationCompat.Builder(this)
+                .setContentTitle("New Email from Malydahe")
+                .setContentText("Do you need something this week from the market?")
+                .setSmallIcon(R.drawable.ic_map_noti)
+                .setGroup(GROUP_KEY_EMIALS)
+                .setLocalOnly(true)
+                .build();
+
+        notificationManagerCompat.notify(NOTIFICATION_ID_FOURTH,notification2);
+
+        Bitmap largeIcon = BitmapFactory.decodeResource(getResources(),R.drawable.lorem_cat);
+
+        //Create a InboxStyle notification
+        Notification sumaryNotification = new NotificationCompat.Builder(this)
+                .setContentTitle("2 new messages")
+                .setSmallIcon(R.drawable.ic_reply_voice)
+                .setLargeIcon(largeIcon)
+                .setStyle(new NotificationCompat.InboxStyle()
+                        .addLine("Tohure repo...")
+                        .addLine("Malydahe week...")
+                        .setBigContentTitle("2 new messages")
+                        .setSummaryText("tohure@gmail.com"))
+                .setGroup(GROUP_KEY_EMIALS)
+                .setGroupSummary(true)
+                .build();
+
+        notificationManagerCompat.notify(NOTIFICATION_ID_GROUP,sumaryNotification);
     }
 }

@@ -20,7 +20,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:onClick="sendNotification"
-        android:text="Do it!" />
+        android:onClick="sendNotificationOnePage"
+        android:text="Notification with One Page" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="sendNotificationTwoPages"
+        android:text="Notification with Two Pages" />
+
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="sendNotificationInGroup"
+        android:text="Notification in Group" />
 
 </LinearLayout>
